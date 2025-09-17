@@ -23,26 +23,29 @@ DROP TABLE IF EXISTS `error`;
 -- PRIMARY KEY를 구문 내에 바로 정의합니다.
 -- ----------------------------
 CREATE TABLE `HR` (
-	`id`	VARCHAR(255)	NOT NULL,
-	`pw`	VARCHAR(255)	NULL,
-	`email`	VARCHAR(255)	NULL,
-	`name`	VARCHAR(255)	NULL,
-	PRIMARY KEY (`id`)
-);
+  `id` VARCHAR(64) NOT NULL,
+  `pw` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(254) NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_hr_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `item` (
-	`id`	INT	NOT NULL AUTO_INCREMENT,
-	`vin`	VARCHAR(255)	NULL,
-	`color`	VARCHAR(255)	NULL,
-	PRIMARY KEY (`id`)
-);
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `vin` VARCHAR(64) NOT NULL,
+  `color` VARCHAR(64) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_item_vin` (`vin`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `machine` (
-	`machine_id`	VARCHAR(255)	NOT NULL,
-	`machine_name`	VARCHAR(255)	NULL,
-	`isRun`	BOOLEAN	NULL,
-	PRIMARY KEY (`machine_id`)
-);
+CREATE TABLE `machine_data_map` (
+   `map_id` INT NOT NULL AUTO_INCREMENT,
+   `machine_id` VARCHAR(255) NOT NULL,
+   `data_id` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`map_id`),
+  UNIQUE KEY `UK_machine_data_pair` (`machine_id`,`data_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `data` (
 	`data_id`	VARCHAR(255)	NOT NULL,
