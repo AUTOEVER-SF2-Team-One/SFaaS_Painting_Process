@@ -96,7 +96,7 @@
 .grid-container {
   flex-grow: 1;
   display: grid;
-  height: 100%;
+  height: 99.9%;
   grid-template-columns: 50% 50%;
   grid-template-rows: 50% 50% ;  /* ✅ 행 높이를 아예 50%로 고정 */
   gap: 0;                      
