@@ -1,7 +1,8 @@
   <template>
     <div class="page">
-      <h2>Detail</h2>
+      <Sidebar />
       <div class="all">
+      <div class="sidebar"></div>
         <div class="grid-container">
           <div class="grid-item"><LineChart :chartData="chartData" :threshold="50" /></div>
           <div class="grid-item"><LineChart :chartData="chartData2" :threshold="70" /></div>
@@ -15,10 +16,11 @@
 
   <script>
   import LineChart from '@/components/LineChart.vue'
-
+  import Sidebar from '@/components/SideBar.vue'
   export default {
     name: 'Detail',
-    components: { LineChart },
+    components: { LineChart, Sidebar },
+
     data() {
       return {
         chartData: {
@@ -81,10 +83,9 @@
 <style scoped>
 .page {
   height: 100%;
-  width: 100%;
+  margin-left: 200px;
   display: flex;
   flex-direction: column;
-  margin: 0;
   padding: 0;
   border: 3px solid blue;
   overflow: hidden;
@@ -92,6 +93,7 @@
 .all{
   height: 100%;
   border: 1px solid red;
+  grid-template-columns: 50% 50%;
 }
 .grid-container {
   flex-grow: 1;
