@@ -30,7 +30,7 @@ Thumbs.db
 *.dll
 *.dSYM/
 
-# Misc
+# Misc 
 .env
 *.swp
 *.swo
@@ -46,3 +46,6 @@ modbus-cpp-docker/build/
 modbus-cpp-docker/*.o
 modbus-cpp-docker/*.exe
 modbus-cpp-docker/*.out
+
+# visual studio
+.vs/
