@@ -1,12 +1,12 @@
 <template>
   <header class="header">
-    <h1 class="logo">1Team</h1>
+    <h1 class="logo">GM</h1>
     <nav class="nav">
       <NavButton text="Main" to="/main" />
       <NavButton text="Detail" to="/detail" />
       <NavButton text="Defect" to="/defect" />
       <NavButton text="Downtime" to="/downtime" />
-      <NavButton text="MyPage" to="/mypage" />
+      <NavButton text="MyPage" to="/signup" />
       <NavButton text="Logout" to="/" />
     </nav>
   </header>
@@ -27,7 +27,7 @@ export default {
   left: 0;
   right: 0;
   height: 60px;
-  background: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -16,7 +16,14 @@ export default defineConfig({
     },
   },
   server: {
-    host: '0.0.0.0', // 모든 IP에서 접속 가능
-    port: 5173,       // 원하는 포트
+    proxy: {
+      '/api': {
+        target: 'http://localhost:9090',
+        changeOrigin: true,
+        // rewrite: (path) => path.replace(/^\/api/, ''), // 필요 시 주석 해제
+      },
+    },
+    host: true,  // 로컬 IP로 접근 가능
+    port: 5173,  // 원래 포트 유지
   },
 })

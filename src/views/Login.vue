@@ -4,26 +4,30 @@
       <h1 class="logo">MyApp</h1>
       <p class="welcome-text">로그인 후 서비스를 이용하세요.</p>
       
-      <form @submit="goToMain">
+      <form @submit.prevent="checkBool">
         <input 
           type="text" 
           v-model="username" 
-          placeholder="아이디" 
+          :placeholder="id" 
           required
         />
         <input 
           type="password" 
           v-model="password" 
-          placeholder="비밀번호" 
-          required
+          :placeholder="pwd"
         />
-        <button type="submit">로그인</button>
+        <button type="submit">{{ loginBtn }}</button>
       </form>
 
       <div class="links">
-        <a href="#">회원가입</a>
-        <a href="#">비밀번호 찾기</a>
+        <a href="signup">회원가입</a>
+        <a href="#" @click="isBool">{{ findPwd }}</a>
       </div>
+    </div>
+    <div>
+      <!-- <button @click="endCamera">카메라 끄기</button>
+      <button @click="startCamera">카메라 켜기</button> -->
+      <video ref="video" autoplay playsinline width="640" height="480"></video>
     </div>
   </div>
 </template>
@@ -31,31 +35,122 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+
+const URL = '/api/login';
 const username = ref('');
 const password = ref('');
 const router = useRouter();
+const bool = ref(false);
+const id = ref('아이디');
+const pwd = ref('비밀번호');
+const loginBtn = ref('로그인');
+const findPwd = ref('비밀번호 찾기');
 
-function goToMain() {
-  console.log('hello')
-  router.push('/main') // /main 화면으로 이동
+
+const isBool = () => {
+  console.log(bool.value)
+  if(!bool.value){
+    console.log('hi')
+    pwd.value = "인증번호 입력";
+    loginBtn.value = "인증번호 전송";
+    id.value = "이메일 입력"
+    findPwd.value = "로그인"
+    bool.value = true;
+  }else{
+    bool.value = false;
+    pwd.value = "비밀번호 입력";
+    loginBtn.value = "로그인";
+    id.value = "아이디"
+    findPwd.value = "비밀번호 찾기"
+  }
+  
 }
 
-// export default {
-//   name: 'Login',
-//   data() {
-//     return {
-//       username: '',
-//       password: ''
-//     }
-//   },
-//   methods: {
-//     handleLogin() {
-//       router.push('/downtime');
-//       // 여기서 실제 로그인 로직 추가
-//     //   alert(`아이디: ${this.username}, 비밀번호: ${this.password}`);
-//     }
-//   }
+const checkBool = () => {
+  if(!bool.value) {
+    login();
+  }else{
+    handleSignup();
+  }
+}
+
+const MAIL_SERVER = 'http://127.0.0.1:8000/send-email';
+// const sendCert = () => {
+//     handleSignup();
 // }
+
+const handleSignup = async () => {
+  try {
+    const response = await fetch(MAIL_SERVER, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", 
+      },
+      body: JSON.stringify({
+        to_email: username.value,
+        subject: "MES 인증 번호",
+        body: `${username.value}님은 265544 입니다.`
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("서버 오류: " + response.status);
+    }
+
+    const result = await response.json();
+    console.log("이메일 전송 성공:", result);
+
+  } catch (error) {
+    console.error("이메일 전송 실패:", error);
+  }
+};
+
+const login = async () => {
+  try {
+    const response = await fetch(URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // JSON 전송
+      },
+      // credentials: "include", // 쿠키 인증 필요 시
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value
+      })
+    });
+    console.log(response)
+    alert(response)
+    if (!response.ok) {
+      throw new Error("서버 오류: " + response.status);
+    }
+    router.push('/main') // 로그인 성공 시 이동
+
+    // rows.value = await response.json();
+    console.log("조회 성공:", response);
+  } catch (error) {
+    console.error("조회 실패:", error);
+  }
+};
+
+
+
+// const video = ref(null);
+// const cameraOn = ref(false);
+
+// const endCamera = () => {
+//   router.push('/');
+// };
+
+// const startCamera = async () => {
+//   try {
+//     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+//     video.value.srcObject = stream;
+//     cameraOn.value = true; // 웹캠 화면 보이도록 상태 변경
+//   } catch (err) {
+//     console.error("카메라 접근 실패:", err);
+//     alert("카메라 접근 권한이 필요합니다.");
+//   }
+// };
 
 </script>
 
