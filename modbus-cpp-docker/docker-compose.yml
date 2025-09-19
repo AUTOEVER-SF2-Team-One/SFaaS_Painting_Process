@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   modbus-server-cpp:
+    platform: linux/arm64
     # 현재 폴더의 Dockerfile을 사용하여 이미지를 빌드
     build: .
     container_name: modbus_server_cpp
