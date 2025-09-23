@@ -5,7 +5,7 @@ services:
     platform: linux/arm64
     # 현재 폴더의 Dockerfile을 사용하여 이미지를 빌드
     build: .
-    container_name: modbus_server_cpp
+    container_name: modbus_server
     # 컨테이너가 멈추면 자동으로 다시 시작
     restart: unless-stopped
     
