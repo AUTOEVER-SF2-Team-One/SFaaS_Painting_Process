@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.team1.sfaas.mapper.DetailMapper">
+    <resultMap id="detailMap" type="com.team1.sfaas.model.DetailModel">
+        <result property="machine_id" column="machine_id"/>
+        <result property="machine_name" column="machine_name"/>
+        <result property="is_machine_run" column="is_running" jdbcType="BOOLEAN"/>
+        <result property="machine_date" column="status_update_dt" jdbcType="TIMESTAMP"/>
+        <result property="data_name" column="data_name"/>
+        <result property="threshold_up" column="threshold_up"/>
+        <result property="threshold_down" column="threshold_down"/>
+        <result property="value" column="value"/>
+        <result property="plc_create_dt" column="log_create_dt"/>
+        <result property="start_dt" column="start_dt" jdbcType="TIMESTAMP"/>
+        <result property="end_dt" column="end_dt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <select id="getMachineData" resultMap="detailMap"
+            parameterType="String">
+<!--        // get machineName, machineStartDate, isRun-->
+        SELECT machine_id, machine_name, is_machine_run, machine_date
+        FROM machine
+        WHERE machine_id = #{machine_id}
+    </select>
+
+    <select id="getPLCData" resultMap="detailMap"
+            parameterType="String">
+
+        <!--        get dataName, dataValue, dataDate, dataThreshold-->
+        SELECT
+        dd.data_name,
+        dd.threshold_up,
+        dd.threshold_down,
+        pl.value,
+        pl.log_create_dt AS plc_create_dt,
+        m.machine_name,
+        m.is_running,
+        m.status_update_dt,
+        dt.start_dt,
+        dt.end_dt
+        FROM plc_log pl
+        JOIN sensor s
+        ON pl.sensor_id = s.sensor_id
+        JOIN machine m
+        ON s.machine_id = m.machine_id
+        JOIN machine_data_map mdm
+        ON m.machine_id = mdm.machine_id
+        JOIN data_definition dd
+        ON mdm.data_id = dd.data_id
+        LEFT JOIN downtime dt
+        ON m.machine_id = dt.machine_id
+        WHERE m.machine_id = #{machine_id};
+
+
+    </select>
+
+
+
+</mapper>

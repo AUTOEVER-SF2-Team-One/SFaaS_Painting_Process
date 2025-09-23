@@ -1,102 +1,116 @@
 package com.team1.sfaas.model;
 
 public class DetailModel {
-    private String machineName;
-    private String machineStartDate;
-    private boolean isRun;
-
     // ---- machine information
-    private int data1Value;
-    private String data1Name;
-    private String data1Date;
+        // from machine table
+    private String machine_id;
+    private String machine_name;
+    private int is_machine_run;
+    private String machine_date;
 
-    // ---- data1 information
-    private int data2Value;
-    private String data2Name;
-    private String data2Date;
+    // ---- data information
+        // from data table
+    private String data_name;
+    private double threshold_up;
+    private double threshold_down;
+        // from plc table
+    private double value;
+    private String plc_create_dt;
 
-    // ---- data2 information
-    private int machineRate;
+    // ---- for rate information
+        // from downtime table
+    private String start_dt;
+    private String end_dt;
 
-    // Getters and Setters
-
-    public String getMachineName() {
-        return machineName;
+    public String getMachine_id() {
+        return machine_id;
     }
 
-    public void setMachineName(String machineName) {
-        this.machineName = machineName;
+    public void setMachine_id(String machine_id) {
+        this.machine_id = machine_id;
     }
 
-    public String getMachineStartDate() {
-        return machineStartDate;
+    public String getMachine_name() {
+
+        System.out.println("twsr"+machine_name);
+        return machine_name;
     }
 
-    public void setMachineStartDate(String machineStartDate) {
-        this.machineStartDate = machineStartDate;
+    public void setMachine_name(String machine_name) {
+        this.machine_name = machine_name;
     }
 
-    public boolean isRun() {
-        return isRun;
+    public int getIs_machine_run() {
+        return is_machine_run;
     }
 
-    public void setRun(boolean run) {
-        isRun = run;
+    public void setIs_machine_run(int is_machine_run) {
+        this.is_machine_run = is_machine_run;
     }
 
-    public int getData1Value() {
-        return data1Value;
+    public String getMachine_date() {
+        return machine_date;
     }
 
-    public void setData1Value(int data1Value) {
-        this.data1Value = data1Value;
+    public void setMachine_date(String getMachine_date) {
+        this.machine_date = getMachine_date;
     }
 
-    public String getData1Name() {
-        return data1Name;
+    public String getData_name() {
+        return data_name;
     }
 
-    public void setData1Name(String data1Name) {
-        this.data1Name = data1Name;
+    public void setData_name(String data_name) {
+        this.data_name = data_name;
     }
 
-    public String getData1Date() {
-        return data1Date;
+    public double getThreshold_up() {
+        return threshold_up;
     }
 
-    public void setData1Date(String data1Date) {
-        this.data1Date = data1Date;
+    public void setThreshold_up(double threshold_up) {
+        this.threshold_up = threshold_up;
     }
 
-    public int getData2Value() {
-        return data2Value;
+    public double getThreshold_down() {
+        return threshold_down;
     }
 
-    public void setData2Value(int data2Value) {
-        this.data2Value = data2Value;
+    public void setThreshold_down(double threshold_down) {
+        this.threshold_down = threshold_down;
     }
 
-    public String getData2Name() {
-        return data2Name;
+    public double getValue() {
+        return value;
     }
 
-    public void setData2Name(String data2Name) {
-        this.data2Name = data2Name;
+    public void setValue(double value) {
+        this.value = value;
     }
 
-    public String getData2Date() {
-        return data2Date;
+    public String getPlc_create_dt() {
+        return plc_create_dt;
     }
 
-    public void setData2Date(String data2Date) {
-        this.data2Date = data2Date;
+    public void setPlc_create_dt(String plc_create_dt) {
+        this.plc_create_dt = plc_create_dt;
     }
 
-    public int getMachineRate() {
-        return machineRate;
+    public String getStart_dt() {
+        return start_dt;
     }
 
-    public void setMachineRate(int machineRate) {
-        this.machineRate = machineRate;
+    public void setStart_dt(String start_dt) {
+        this.start_dt = start_dt;
     }
+
+    public String getEnd_dt() {
+        return end_dt;
+    }
+
+    public void setEnd_dt(String end_dt) {
+        this.end_dt = end_dt;
+    }
+
+
 }
