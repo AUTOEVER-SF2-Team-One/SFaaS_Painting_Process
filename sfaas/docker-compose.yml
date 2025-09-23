@@ -2,20 +2,6 @@ version: '3.8'
 
 services:
   # Spring Boot 애플리케이션 서비스
-  app:
-    build: . # 현재 폴더(sfaas)의 Dockerfile을 사용하여 이미지를 빌드합니다.
-    container_name: sfaas-app
-    depends_on:
-      db:
-        condition: service_healthy # db 서비스의 healthcheck가 통과될 때까지 app 시작을 지연시킵니다.
-    ports:
-      - "8081:8081" # 호스트의 8080 포트와 컨테이너의 8080 포트를 연결합니다.
-#    environment:
-#      # application.properties의 설정을 덮어쓰게 됩니다.
-#      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/sfaas_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-#      - SPRING_DATASOURCE_USERNAME=root
-#      - SPRING_DATASOURCE_PASSWORD=root
-#      - SPRING_JPA_HIBERNATE_DDL_AUTO=update # 애플리케이션 실행 시 DB 스키마를 업데이트합니다.
 
   # MySQL 데이터베이스 서비스
   db:
