@@ -113,6 +113,7 @@
           console.log("받은 데이터:", data);
           // chartData 업데이트 로직 추가 가능
           const keys = Object.keys(data);
+          console.log("데이터 키들:", keys);
           const runTime = calculateTotalRunTime(data[keys[0]]);
           this.totalRunTime = runTime.text;
 
@@ -131,6 +132,7 @@
           };
           if (keys.length > 0) {
             const arr1 = data[keys[0]].slice(-5);
+            console.log("첫번째 키의 최근 5개 데이터:", arr1);
             this.thresholdUp1 = arr1[0].threshold_up;
             this.thresholdDown1 = arr1[0].threshold_down;
             this.chartData = {
@@ -142,7 +144,17 @@
                   borderColor: '#64CCA2',
                   backgroundColor: 'rgba(100,204,162,0.2)',
                   fill: true,
-                  tension: 0.3
+                  tension: 0.3,
+                  datalabels: {
+                    display: true,
+                    align: 'top',      // 점 위쪽에 표시
+                    offset: 1,        // 점에서 10px 위로 오프셋
+                    color: '#333',
+                    font: {
+                      size: 10,
+                      weight: 'bold'
+                    }
+                  }
                 }
               ]
             };
@@ -162,7 +174,17 @@
               borderColor: '#FF6B6B',
               backgroundColor: 'rgba(255,107,107,0.2)',
               fill: true,
-              tension: 0.3
+              tension: 0.3,
+              datalabels: {
+                display: true,
+                align: 'top',      // 점 위쪽에 표시
+                offset: 1,        // 점에서 10px 위로 오프셋
+                color: '#333',
+                font: {
+                  size: 10,
+                  weight: 'bold'
+                }
+              }
             }
           ]
         };
@@ -232,14 +254,12 @@
     display: flex;
     flex-direction: column;
     padding: 0;
-    border: 3px solid blue;
     overflow: hidden;
   }
   .all{
     height: 100%;
-    border: 1px solid red;
     grid-template-columns: 50% 50%;
-  }
+  } 
   .grid-container {
     flex-grow: 1;
     display: grid;  
@@ -250,22 +270,25 @@
     padding: 0;                   
     margin: 0;                    
     width: 100%;
-    border: 5px solid yellow;
+    /* border: 5px solid yellow; */
   }
 
   .grid-item {
     display: flex;
     align-items: stretch;
     justify-content: stretch;
-    background: #fff;
+    /* background: #fff; */
     border: 1px solid #ccc;
     box-sizing: border-box;
-    border: 2px solid green;
+    border: 2px solid gray;
+    border-radius: 20px;
+    width: 95%;
+    height: 95%;
   }
 
   .grid-item canvas {
-    width: 100% !important;
-    height: 100% !important; /* grid-item 크기에 맞춤 */
+    width: 90% !important;
+    height: 90% !important; /* grid-item 크기에 맞춤 */  
   }
   .status-indicator {
     display: flex;
@@ -296,5 +319,10 @@
     align-items: center;
     justify-content: center;
     padding: 10px;
+  }
+  /* 3번째 grid-item (왼쪽 아래) */
+  .grid-item:nth-child(3) {
+    display: flex;  
+    align-items: center;   /* 세로 가운데 */
   }
   </style>
