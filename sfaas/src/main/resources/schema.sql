@@ -47,6 +47,14 @@ CREATE TABLE `machine_data_map` (
   UNIQUE KEY `UK_machine_data_pair` (`machine_id`,`data_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+
+CREATE TABLE `machine` (
+	`machine_id`	VARCHAR(255)	NOT NULL,
+	`machine_name`	VARCHAR(255)	NULL,
+	`isRun`	BOOLEAN	NULL,
+	PRIMARY KEY (`machine_id`)
+);
+
 CREATE TABLE `data` (
 	`data_id`	VARCHAR(255)	NOT NULL,
 	`data_name`	VARCHAR(255)	NULL,
@@ -92,13 +100,6 @@ CREATE TABLE `plc` (
 	`create_dt`	DATETIME	NULL,
 	`machine_id`	VARCHAR(255)	NOT NULL,
 	PRIMARY KEY (`plc_id`)
-);
-
-CREATE TABLE `machine_data_map` (
-	`map_id`	INT	NOT NULL AUTO_INCREMENT,
-	`machine_id`	VARCHAR(255)	NOT NULL,
-	`data_id`	VARCHAR(255)	NOT NULL,
-	PRIMARY KEY (`map_id`)
 );
 
 -- ----------------------------
