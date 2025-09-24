@@ -76,9 +76,9 @@
     <select id="selectErrorDistributionByType" resultType="map">
         SELECT
         CASE
-        WHEN m.machine_name LIKE '%OVEN%' THEN 'OVEN'
-        WHEN m.machine_name LIKE '%PAINT%' THEN 'PAINT'
-        WHEN m.machine_name LIKE '%DEPO%' THEN 'DEPO'
+        WHEN m.machine_id LIKE '%OVEN%' THEN '오븐'
+        WHEN m.machine_id LIKE '%PAINT%' THEN '스프레이'
+        WHEN m.machine_id LIKE '%DEPO%' THEN '전착'
         ELSE 'OTHER'
         END as name,
         COUNT(*) as value
