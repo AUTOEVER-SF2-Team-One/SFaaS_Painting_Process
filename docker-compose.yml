@@ -5,7 +5,7 @@ services:
       context: ./SFaaS_Front
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8081"
     volumes:
       - ./SFaaS_Front:/app
     command: npm run serve
