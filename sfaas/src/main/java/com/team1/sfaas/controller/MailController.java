@@ -22,10 +22,8 @@ public class MailController {
     public String sendMail(
             @RequestParam String to
     ) {
-        System.out.println("MailController.sendMail 호출됨: to=" + to);
         try {
             mailService.sendMail(to);
-            System.out.println("MailController.sendMail.here 호출됨: to=" + to);
             return "메일 전송 성공: " + to;
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,7 +39,6 @@ public class MailController {
 
         boolean ok = mailService.verifyCode(email, code);
         Map<String, Object> result = new HashMap<>();
-        System.out.println(ok);
         if(ok){
             result.put("status", "success");
             result.put("message", "인증되었습니다.");
