@@ -47,7 +47,6 @@ public class HrController {
     // 사용자 등록
     @PostMapping
     public Map<String, Object> createUser(@RequestBody Hr hr) {
-        System.out.println(hr);
         Map<String, Object> result = new HashMap<>();
 
           // 1) 솔트 생성
@@ -103,8 +102,6 @@ public class HrController {
     // 사용자 수정
     @PutMapping("/update/{id}")
     public Map<String, Object> updateUser(@RequestBody Hr hr) {
-        System.out.println("사용자 정보 수정");
-        System.out.println("비밀번호"+ hr);
         Map<String, Object> result = new HashMap<>();
         String hashHex = HashUtil.sha256WithSaltHex(hr.getPw(), salt);
         
@@ -131,8 +128,6 @@ public class HrController {
     // 로그인 처리 POST
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody Map<String, String> loginForm) {
-
-        System.out.println("로그인시도");
         Map<String, Object> result = new HashMap<>();
         // Map에서 값 꺼내기
         String username = loginForm.get("username");
@@ -147,8 +142,6 @@ public class HrController {
             return result;
         }
 
-        System.out.println(hr.getId());
-        System.out.println("로그인마무리");
     
         if (hr.getName() != null && !hr.getName().trim().isEmpty()) {
             result.put("status", "success");
