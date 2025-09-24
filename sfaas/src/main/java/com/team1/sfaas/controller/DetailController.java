@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("/api")
 public class DetailController {
 
     private final DetailService detailService;
@@ -19,8 +19,25 @@ public class DetailController {
     public DetailController(DetailService detailService){
         this.detailService = detailService;
     }
-
     @GetMapping("/detail")
+    public List<String> getDetail(){
+        List<DetailModel> machines = detailService.getMachine();
+        List<String> machineNameList = machines.stream()
+                .map(DetailModel::getMachine_name)
+                .collect(Collectors.toList());
+        return machineNameList;
+    }
+    @GetMapping("/detail/machineid")
+    public String getMachineId(@RequestParam("machine_id") String machine_name){
+        DetailModel ids = detailService.getMachineName(machine_name);
+        return ids.getMachine_id();
+    }
+    @GetMapping("/detail/machineInformation")
+    public DetailModel getMachineInformation(@RequestParam("machine_id") String machine_id){
+        List<DetailModel> ids = detailService.getMachineInformation(machine_id);
+        return ids.get(ids.size() - 1);
+    }
+    @GetMapping("/detail/information")
     public Map<String, List<DetailModel>> getDetail(@RequestParam("machine_id") String machine_id){
 
         List<DetailModel> temp = detailService.getDetail(machine_id);

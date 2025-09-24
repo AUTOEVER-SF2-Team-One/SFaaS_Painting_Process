@@ -18,6 +18,16 @@ public class DetailService {
         this.detailMapper = detailMapper;
     }
 
+    public  List<DetailModel> getMachine(){
+        return detailMapper.getMachineData();
+    }
+
+    public DetailModel getMachineName(String machine_name){
+        return detailMapper.getMachineName(machine_name);
+    }
+    public List<DetailModel> getMachineInformation(String machine_id){
+        return detailMapper.getMachineInformation(machine_id);
+    }
     public List<DetailModel> getDetail(String machine_id) {
         List<DetailModel> detailData;
         DetailModel machineData;

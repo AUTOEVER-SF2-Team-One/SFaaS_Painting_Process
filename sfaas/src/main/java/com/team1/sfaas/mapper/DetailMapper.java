@@ -10,4 +10,7 @@ import java.util.List;
 public interface DetailMapper {
     // get dataName, dataValue, dataDate, dataThreshold
     List<DetailModel> getPLCData(@Param("machine_id") String machine_id);
+    List<DetailModel> getMachineInformation(@Param("machine_id") String machine_id);
+    List<DetailModel> getMachineData();
+    DetailModel getMachineName(@Param("machine_name") String machine_name);
 }

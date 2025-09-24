@@ -19,38 +19,40 @@
     <select id="getMachineData" resultMap="detailMap"
             parameterType="String">
 <!--        // get machineName, machineStartDate, isRun-->
-        SELECT machine_id, machine_name, is_machine_run, machine_date
+        SELECT machine_name, machine_id
         FROM machine
-        WHERE machine_id = #{machine_id}
     </select>
 
+    <select id="getMachineName" resultMap="detailMap"
+            parameterType="String">
+        <!--        // get machineName, machineStartDate, isRun-->
+        SELECT machine_id
+        FROM machine
+        WHERE machine_name = #{machine_name}
+    </select>
+
+    <select id="getMachineInformation" resultMap="detailMap"
+            parameterType="String">
+        <!--        get dataName, dataValue, dataDate, dataThreshold-->
+        SELECT m.machine_name, m.is_running, m.status_update_dt
+        FROM machine m
+        WHERE m.machine_id = #{machine_id}
+    </select>
+    
     <select id="getPLCData" resultMap="detailMap"
             parameterType="String">
 
         <!--        get dataName, dataValue, dataDate, dataThreshold-->
-        SELECT
-        dd.data_name,
-        dd.threshold_up,
-        dd.threshold_down,
-        pl.value,
-        pl.log_create_dt AS plc_create_dt,
-        m.machine_name,
-        m.is_running,
-        m.status_update_dt,
-        dt.start_dt,
-        dt.end_dt
-        FROM plc_log pl
-        JOIN sensor s
-        ON pl.sensor_id = s.sensor_id
-        JOIN machine m
-        ON s.machine_id = m.machine_id
-        JOIN machine_data_map mdm
-        ON m.machine_id = mdm.machine_id
-        JOIN data_definition dd
-        ON mdm.data_id = dd.data_id
-        LEFT JOIN downtime dt
-        ON m.machine_id = dt.machine_id
-        WHERE m.machine_id = #{machine_id};
+        SELECT m.machine_name, m.is_running, m.status_update_dt,
+            dd.data_name, dd.threshold_up, dd.threshold_down,
+            pl.value, pl.log_create_dt, d.start_dt, d.end_dt
+        FROM machine m
+        JOIN machine_data_map mdm ON m.machine_id = mdm.machine_id
+        JOIN data_definition dd ON mdm.data_id = dd.data_id
+        JOIN sensor s ON mdm.sensor_id = s.sensor_id
+        JOIN plc_log pl ON s.sensor_id = pl.sensor_id
+        JOIN downtime d ON m.machine_id = d.machine_id
+        WHERE m.machine_id = #{machine_id}
 
 
     </select>
