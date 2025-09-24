@@ -31,6 +31,8 @@ export default {
   left: 0;
   width: 200px;
   height: calc(100vh - 60.5px); /* 네비게이션 바 높이를 제외한 전체 높이 */
+  /* background: linear-gradient(180deg, #1e3c72, #2a5298);
+   */
   background-color: white;
   color: black;
   /* box-shadow: 2px 0 5px rgba(0,0,0,0.1); */
@@ -48,7 +50,9 @@ export default {
 }
 
 .side-bar a {
+  padding-top: 10%;
   color: black;
+
   text-decoration: none;
   display: block;
   transition: background-color 0.3s ease;
