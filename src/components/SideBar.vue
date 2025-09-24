@@ -1,16 +1,26 @@
 <template>
   <div class="side-bar">
     <ul>
-      <li><a href="#">🏠 홈</a></li>
-      <li><a href="#">📊 대시보드</a></li>
-      <li><a href="#">⚙️ 설정</a></li>
+      <li v-for="(item, index) in menuItems" :key="index">
+        <a href="#" @click.prevent="handleClick(item)">{{ item.icon }} {{ item.label }}</a>
+      </li>
     </ul>
   </div>
 </template>
-
 <script>
 export default {
-  name: 'SideBar'
+  name: 'SideBar',
+  props: {
+    menuItems: {
+      type: Array,
+      required: true
+    }
+  },
+  methods: {
+    handleClick(item) {
+      this.$emit('menu-clicked', item); // 부모에게 클릭된 메뉴 전달
+    }
+  }
 }
 </script>
 

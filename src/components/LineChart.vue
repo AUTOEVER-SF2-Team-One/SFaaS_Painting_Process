@@ -24,7 +24,8 @@ export default {
   components: { Line },
   props: {
     chartData: Object,
-    threshold: Number
+    thresholdUp: Number,
+    thresholdDown: Number
   },
   computed: {
     chartOptions() {
@@ -36,11 +37,22 @@ export default {
           title: { display: true, text: '주간 온도 그래프' },
           annotation: {
             annotations: {
-              thresholdLine: {
+              thresholdUpLine: {
                 type: 'line',
-                yMin: this.threshold,
-                yMax: this.threshold,
+                yMin: this.thresholdUp,
+                yMax: this.thresholdUp,
                 borderColor: 'red',
+                borderWidth: 2,
+                label: {
+                  display: true,
+                  position: 'end'
+                }
+              },
+              thresholdDownLine: {
+                type: 'line',
+                yMin: this.thresholdDown,
+                yMax: this.thresholdDown,
+                borderColor: 'blue',
                 borderWidth: 2,
                 label: {
                   display: true,
@@ -53,7 +65,7 @@ export default {
         scales: {
           y: {
             min: 0,
-            max: 100
+            max: 200
           }
         }
       }

@@ -6,7 +6,7 @@
       
       <form @submit.prevent="checkBool">
         <input 
-          type="text" 
+          :type="inputType"
           v-model="username" 
           :placeholder="id" 
           required
@@ -36,29 +36,36 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-const URL = '/api/login';
+const URL = '/api/hr/login';
+const URL_PASSWORD = '/api/hr';
 const username = ref('');
 const password = ref('');
 const router = useRouter();
 const bool = ref(false);
+const inputType = ref('text');
 const id = ref('아이디');
 const pwd = ref('비밀번호');
 const loginBtn = ref('로그인');
 const findPwd = ref('비밀번호 찾기');
+const certVal = ref('F'); //F 는 인증 번호, S는 인증 확인
 
 
 const isBool = () => {
   console.log(bool.value)
   if(!bool.value){
-    console.log('hi')
     pwd.value = "인증번호 입력";
+    password.value = '';
+    inputType.value = "email";
     loginBtn.value = "인증번호 전송";
     id.value = "이메일 입력"
     findPwd.value = "로그인"
+    certVal.value = "F";
     bool.value = true;
   }else{
     bool.value = false;
+    password.value = '';
     pwd.value = "비밀번호 입력";
+    inputType.value = "text";
     loginBtn.value = "로그인";
     id.value = "아이디"
     findPwd.value = "비밀번호 찾기"
@@ -70,43 +77,92 @@ const checkBool = () => {
   if(!bool.value) {
     login();
   }else{
-    handleSignup();
+    if(certVal.value === "F"){
+      handleSignup();
+    }else{
+      checkIn();
+    }
+    
   }
 }
 
-const MAIL_SERVER = 'http://127.0.0.1:8000/send-email';
-// const sendCert = () => {
-//     handleSignup();
-// }
+const MAIL_SERVER = '/api/mail/send';
+const MAIL_SERVER_CERT = '/api/mail/verify';
 
 const handleSignup = async () => {
   try {
-    const response = await fetch(MAIL_SERVER, {
+    const to = encodeURIComponent(username.value);
+
+    const response = await fetch(`${MAIL_SERVER}?to=${to}`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json", 
-      },
-      body: JSON.stringify({
-        to_email: username.value,
-        subject: "MES 인증 번호",
-        body: `${username.value}님은 265544 입니다.`
-      })
+      // 쿼리 파라미터 방식이므로 Content-Type 필요 없음
     });
+
+    loginBtn.value = "인증번호 확인";
+    certVal.value = "S";
 
     if (!response.ok) {
       throw new Error("서버 오류: " + response.status);
     }
-
-    const result = await response.json();
-    console.log("이메일 전송 성공:", result);
 
   } catch (error) {
     console.error("이메일 전송 실패:", error);
   }
 };
 
+const checkIn = async () => {
+  if(password.value.length !== 6){
+    alert('인증번호 6자리 입력해주세요!');
+  }
+
+  const certRes = await fetch(MAIL_SERVER_CERT, {
+    method: "POST",
+    headers:{
+      "Content-Type": "application/json", // JSON 전송
+    },
+    body: JSON.stringify({
+      username: username.value,
+      password: password.value
+    })});
+    console.log(response)
+
+    // .then(res => {console.log(res)})
+    // .then(data => {
+    //   if (data.status === 'fail') {
+    //     throw new Error("인증번호 오류: " + data.message);
+    //   } else {
+    //     console.log("인증완료");
+    //   }
+    // })
+    
+  const response = await fetch(URL_PASSWORD + `/${username.value}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json", // JSON 전송
+    },
+    body: JSON.stringify({
+      username: username.value
+    })
+  }).then(res => res.json())
+    .then(data => {
+      if (data.status === 'fail') {
+        throw new Error("로그인 오류: " + data.message);
+      } else {
+        alert('인증되었습니다. 비밀번호는 1111로 초기화 되었습니다.');
+        isBool();
+        username.value = '';
+        password.value = '';
+      }
+    })
+    .catch(err => {
+      console.error(err.message);
+      alert(err.message);
+    });
+}
+
 const login = async () => {
   try {
+    console.log(username.value)
     const response = await fetch(URL, {
       method: "POST",
       headers: {
@@ -117,18 +173,20 @@ const login = async () => {
         username: username.value,
         password: password.value
       })
-    });
-    console.log(response)
-    alert(response)
-    if (!response.ok) {
-      throw new Error("서버 오류: " + response.status);
-    }
-    router.push('/main') // 로그인 성공 시 이동
-
-    // rows.value = await response.json();
-    console.log("조회 성공:", response);
+    }).then(res => res.json())
+      .then(data => {
+        if (data.status === 'fail') {
+          throw new Error("로그인 오류: " + data.message);
+        } else {
+          router.push('/main'); // 로그인 성공 시 이동
+        }
+      })
+      .catch(err => {
+        console.error(err.message);
+        alert(err.message);
+      });
   } catch (error) {
-    console.error("조회 실패:", error);
+    console.error("로그인 실패:", error);
   }
 };
 
@@ -176,8 +234,9 @@ const login = async () => {
   /* 로그인 박스를 우측 20% 지점에 배치 */
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding-left: 40%; /* 좌측에서 20% 지점 */
+  justify-content: center;
+  /* padding-left: 40%;  */
+  /* 좌측에서 20% 지점 */
 }
 
 /* 로그인 박스 */
@@ -397,4 +456,6 @@ button:active {
     transform: rotate(360deg);
   }
 }
+
+
 </style>
