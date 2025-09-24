@@ -41,7 +41,7 @@ export default {
   setup() {
     const username = ref('');
     const chatOpen = ref(false);
-    const socket = io('http://192.168.203.249:3000');
+    const socket = io('http://192.168.203.68:3000');
     const messages = ref([]);
     const inputMsg = ref('');
 
