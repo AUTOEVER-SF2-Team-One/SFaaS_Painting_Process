@@ -111,8 +111,6 @@ export default {
             }
           },
           y: {
-            min: 0,
-            max: 200,
             title: {
               display: true,
               text: '온도 (℃)',
