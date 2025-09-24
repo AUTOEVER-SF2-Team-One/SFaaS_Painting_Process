@@ -20,11 +20,15 @@ export default {
   watch: {
     chartData: {
       deep: true,
-      handler() {
+      handler(newData) {
         if (this.chartInstance) {
-          this.chartInstance.destroy() // 기존 차트 제거
+          // 새 데이터로 차트 업데이트
+          this.chartInstance.data = newData;
+          this.chartInstance.update(); // 차트 다시 그리기
+        } else {
+          // 차트 인스턴스가 없으면 새로 렌더링
+          this.renderChart();
         }
-        this.renderChart() // 새로 그리기
       }
     }
   },
