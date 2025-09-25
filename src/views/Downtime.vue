@@ -296,6 +296,7 @@ th {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  height: 350px; 
 }
 h3 {
   font-size: 1.2rem;
