@@ -5,6 +5,7 @@ import com.team1.sfaas.service.DetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,6 +54,14 @@ public class DetailController {
             }
         });
         return groupedMap;
+    }
+
+    @GetMapping("/detail/utilization")
+    public Map<String, Double> getUtilization(@RequestParam("machine_id") String machine_id) {
+        double utilizationRate = detailService.getUtilizationLastHour(machine_id);
+        Map<String, Double> response = new HashMap<>();
+        response.put("utilizationRate", utilizationRate);
+        return response;
     }
 
     @GetMapping("/test")

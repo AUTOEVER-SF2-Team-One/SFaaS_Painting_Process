@@ -39,7 +39,7 @@
         FROM machine m
         WHERE m.machine_id = #{machine_id}
     </select>
-    
+
     <select id="getPLCData" resultMap="detailMap"
             parameterType="String">
 
@@ -54,8 +54,17 @@
         JOIN plc_log pl ON s.sensor_id = pl.sensor_id
         JOIN downtime d ON m.machine_id = d.machine_id
         WHERE m.machine_id = #{machine_id}
+    </select>
 
-
+    <select id="getDowntimeSecondsLastHour" resultType="long" parameterType="String">
+        SELECT COALESCE(SUM(TIMESTAMPDIFF(SECOND,
+        GREATEST(start_dt, NOW() - INTERVAL 1 HOUR),
+        LEAST(COALESCE(end_dt, NOW()), NOW())
+        )), 0)
+        FROM downtime
+        WHERE machine_id = #{machine_id}
+        AND start_dt &lt; NOW()
+        AND COALESCE(end_dt, NOW()) &gt; NOW() - INTERVAL 1 HOUR
     </select>
 
 

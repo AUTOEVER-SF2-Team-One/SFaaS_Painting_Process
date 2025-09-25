@@ -13,4 +13,5 @@ public interface DetailMapper {
     List<DetailModel> getMachineInformation(@Param("machine_id") String machine_id);
     List<DetailModel> getMachineData();
     DetailModel getMachineName(@Param("machine_name") String machine_name);
+    long getDowntimeSecondsLastHour(@Param("machine_id") String machine_id);
 }
