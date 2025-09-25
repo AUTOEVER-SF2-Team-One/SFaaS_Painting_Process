@@ -248,7 +248,7 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   margin-bottom: 20px;
-  height: 300px;
+  /* height: 300px; */ /* 삭제 */
 }
 .details-grid {
   display: grid;
@@ -297,7 +297,7 @@ th {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 350px; 
+  /* height: 350px; */ /* 삭제 */
 }
 h3 {
   font-size: 1.2rem;

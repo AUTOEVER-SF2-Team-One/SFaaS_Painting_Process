@@ -322,10 +322,11 @@
   padding-bottom: 12px;
 }
 
-/* 차트 카드 스타일 */
+/* 차트 카드 스타일 
 .chart-card {
   height: 350px;
 }
+  */
 
 /* 중요도에 따른 너비 조절 */
 .data-row > .chart-card {

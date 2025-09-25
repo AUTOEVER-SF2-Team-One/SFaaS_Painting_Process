@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-content">
+  <div class="main-content">
     <h2 class="view-title">불량 데이터 대시보드</h2>
 
     <div class="kpi-container">
@@ -158,17 +158,15 @@ export default {
 
 <style scoped>
 /* 전체 페이지 스타일 */
-.dashboard-content {
+.main-content {
   padding: 20px;
   background-color: #f4f7f6;
-  margin: 0
 }
 .view-title {
   font-size: 1.8rem;
   font-weight: 600;
   color: #333;
   margin-bottom: 20px;
-  
 }
 .kpi-container {
   display: grid;
@@ -199,7 +197,7 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   margin-bottom: 20px;
-  height: 300px;
+  /* height: 300px; */ /* 삭제 */
 }
 .details-grid {
   display: grid;
@@ -247,7 +245,7 @@ th {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 350px; 
+  /* height: 350px;  */ /* 삭제 */
 }
 h3 {
   font-size: 1.2rem;
