@@ -158,12 +158,9 @@ export default {
 /* page-container 스타일 제거 */
 .main-content {
   flex-grow: 1;
-  padding: 25px;
   /* margin-left 제거하여 전체 너비 사용 */
-  overflow-y: auto;
   background-color: #f4f7f6;
   width: 100%; /* 전체 너비 차지하도록 설정 */
-  height: 100%;
 }
 .view-title {
   font-size: 2rem;
