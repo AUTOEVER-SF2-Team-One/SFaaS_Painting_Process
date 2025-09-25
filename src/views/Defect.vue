@@ -1,5 +1,5 @@
 <template>
-  <div class="main-content">
+  <div class="dashboard-content">
     <h2 class="view-title">불량 데이터 대시보드</h2>
 
     <div class="kpi-container">
@@ -158,15 +158,17 @@ export default {
 
 <style scoped>
 /* 전체 페이지 스타일 */
-.main-content {
+.dashboard-content {
   padding: 20px;
   background-color: #f4f7f6;
+  margin: 0
 }
 .view-title {
   font-size: 1.8rem;
   font-weight: 600;
   color: #333;
   margin-bottom: 20px;
+  
 }
 .kpi-container {
   display: grid;
