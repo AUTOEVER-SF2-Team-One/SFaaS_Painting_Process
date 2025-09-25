@@ -1,7 +1,7 @@
 package com.team1.sfaas.controller;
 
 import com.team1.sfaas.model.DowntimeLog;
-import com.team1.sfaas.model.KpiData;
+import com.team1.sfaas.model.DowntimeKpi;
 import com.team1.sfaas.model.ChartData;
 import com.team1.sfaas.service.DowntimeService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ public class DowntimeController {
     }
 
     @GetMapping("/kpi")
-    public KpiData getKpiData(@RequestParam(defaultValue = "all") String machine_id) {
+    public DowntimeKpi getKpiData(@RequestParam(defaultValue = "all") String machine_id) {
         return downtimeService.getKpiData(machine_id);
     }
 

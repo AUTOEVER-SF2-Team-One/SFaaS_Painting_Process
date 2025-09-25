@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class KpiData {
+public class DowntimeKpi {
     private long totalDowntime;
     private String mostFrequentError;
     private String longestDowntimeMachine;

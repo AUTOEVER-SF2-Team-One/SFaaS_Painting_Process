@@ -2,7 +2,7 @@ package com.team1.sfaas.service;
 
 import com.team1.sfaas.mapper.DowntimeMapper;
 import com.team1.sfaas.model.DowntimeLog;
-import com.team1.sfaas.model.KpiData;
+import com.team1.sfaas.model.DowntimeKpi;
 import com.team1.sfaas.model.ChartData;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -21,12 +21,12 @@ public class DowntimeService {
         this.downtimeMapper = downtimeMapper;
     }
 
-    public KpiData getKpiData(String machineId) {
+    public DowntimeKpi getKpiData(String machineId) {
         Long totalDowntime = downtimeMapper.selectTotalDowntimeToday(machineId);
         String mostFrequentError = downtimeMapper.selectMostFrequentError(machineId);
         String longestDowntimeMachine = downtimeMapper.selectLongestDowntimeMachine();
 
-        return new KpiData(
+        return new DowntimeKpi(
                 totalDowntime != null ? totalDowntime : 0,
                 mostFrequentError != null ? mostFrequentError : "N/A",
                 longestDowntimeMachine != null ? longestDowntimeMachine : "N/A"
