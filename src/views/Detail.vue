@@ -14,7 +14,7 @@
         </div>
 
         <div class="grid-card chart-card">
-            <h3 class="card-header">가동률</h3>
+            <h3 class="card-header">최근 1시간 가동률</h3>
             <DoughnutChart :chartData="doughnutData" />
         </div>
 
@@ -44,10 +44,8 @@
 </template>
 
 <script>
-  // <script> 내용은 이전 제안과 동일하게 유지합니다.
   import LineChart from '@/components/LineChart.vue'
   import Sidebar from '@/components/SideBar.vue'
-  import { TrackOpTypes } from 'vue';
   import DoughnutChart from '@/components/DoughnutChart.vue';
   import axios from 'axios';
   const DETAIL_SERVER = '/api/detail';
@@ -58,7 +56,6 @@
 
       data() {
         return {
-          totalRunTime: '',
           machines: ['error'],
           machineID: '',
           menus: [
@@ -81,7 +78,7 @@
           thresholdDown2: 0,
           machineName: '',
           machineDate: '',
-          machineIsRun: 0,
+          isMachineRun: 0, // isMachineRun으로 수정
           doughnutData: {
             labels: ['가동', '비가동'],
             datasets: [{
@@ -89,130 +86,83 @@
               backgroundColor: ['#64CCA2', '#FFD166']
             }]
           },
-          runRatio: 0,
-          idleRatio: 0,
         }
       },
       
       methods: {
       async getDetailInformaition(machine_id) {
-          function calculateTotalRunTime(dataArray) {
-            if (!Array.isArray(dataArray)) {
-              return {
-                text: "24시간 0분",
-                minutes: 1440,
-              };
-            }
-            let totalMs = 0;
-
-            dataArray.forEach(item => {
-              if (item.start_dt && item.end_dt) {
-                const start = new Date(item.start_dt);
-                const end = new Date(item.end_dt);
-                const diff = end - start;
-                totalMs += diff;
-              }
-            });
-
-            const totalMinutes = Math.floor(totalMs / 1000 / 60);
-            const hours = Math.floor(totalMinutes / 60);
-            const minutes = totalMinutes % 60;
-
-            return {
-              text: `${hours}시간 ${minutes}분`,
-              minutes: totalMinutes
-            };
-          }
-
         try {
           const to = machine_id;
           console.log("선택된 머신 아이디:", to);
-          const response = await axios.get(`${DETAIL_SERVER}/information?machine_id=${to}`);
-          const data = response.data;
-          const response2 = await axios.get(`${DETAIL_SERVER}/machineInformation?machine_id=${to}`);
-          const data2 = response2.data;
-          this.machineName = data2.machine_name + " " + to;
-          this.machineDate = data2.machine_date;
-          this.isMachineRun = data2.is_machine_run;
-          console.log("받은 데이터:", data);
-          // chartData 업데이트 로직 추가 가능
-          const keys = Object.keys(data);
-          console.log("데이터 키들:", keys);
-          const runTime = calculateTotalRunTime(data[keys[0]]);
-          this.totalRunTime = runTime.text;
+          
+          // 여러 API 요청을 병렬로 처리하여 성능 향상
+          const [infoResponse, machineInfoResponse, utilizationResponse] = await Promise.all([
+            axios.get(`${DETAIL_SERVER}/information?machine_id=${to}`),
+            axios.get(`${DETAIL_SERVER}/machineInformation?machine_id=${to}`),
+            axios.get(`${DETAIL_SERVER}/utilization?machine_id=${to}`) // ✅ 가동률 API 호출 추가
+          ]);
 
-          const totalMinutesInDay = 24 * 60;
-          this.runRatio = Math.min(runTime.minutes, totalMinutesInDay) / 1440 * 100; // 24시간 초과 방지
-          this.idleRatio = 100 - this.runRatio;
+          // 설비 정보 업데이트
+          const machineInfoData = machineInfoResponse.data;
+          this.machineName = machineInfoData.machine_name + " " + to;
+          this.machineDate = machineInfoData.machine_date;
+          this.isMachineRun = machineInfoData.is_machine_run;
 
-          console.log("가동 시간 비율:", this.runRatio, "분");
-          console.log("비가동 시간 비율:", this.idleRatio, "분");
+          // 📈 가동률 차트 데이터 업데이트 (새로운 방식)
+          const utilizationData = utilizationResponse.data;
+          const utilizationRate = utilizationData.utilizationRate;
           this.doughnutData = {
             labels: ['가동', '비가동'],
             datasets: [{
-              data: [this.runRatio, this.idleRatio],
+              data: [utilizationRate, 100 - utilizationRate], // API에서 받은 값으로 설정
               backgroundColor: ['#64CCA2', '#FFD166']
             }]
           };
+          console.log("최근 1시간 가동률:", utilizationRate, "%");
+
+          // 라인 차트 데이터 업데이트
+          const infoData = infoResponse.data;
+          const keys = Object.keys(infoData);
+
           if (keys.length > 0) {
-            const arr1 = data[keys[0]].slice(-5);
-            console.log("첫번째 키의 최근 5개 데이터:", arr1);
+            const arr1 = infoData[keys[0]].slice(-5);
             this.thresholdUp1 = arr1[0].threshold_up;
             this.thresholdDown1 = arr1[0].threshold_down;
             this.chartData = {
-              labels: arr1.map(d => d.plc_create_dt.slice(11, 16)), // HH:MM
+              labels: arr1.map(d => d.plc_create_dt.slice(11, 16)),
               datasets: [
                 {
-                  label: keys[0], // 동적으로 라벨 반영
+                  label: keys[0],
                   data: arr1.map(d => Number(d.value)),
                   borderColor: '#64CCA2',
                   backgroundColor: 'rgba(100,204,162,0.2)',
                   fill: true,
                   tension: 0.3,
-                  datalabels: {
-                    display: true,
-                    align: 'top',      // 점 위쪽에 표시
-                    offset: 1,        // 점에서 10px 위로 오프셋
-                    color: '#333',
-                    font: {
-                      size: 10,
-                      weight: 'bold'
-                    }
-                  }
+                  datalabels: { display: true, align: 'top', offset: 1, color: '#333', font: { size: 10, weight: 'bold' } }
                 }
               ]
             };
-      }
+          }
 
-      // 두 번째 key → chartData2
-      if (keys.length > 1) {
-        const arr2 = data[keys[1]].slice(-5);
-        this.thresholdUp2 = arr2[0].threshold_up;
-        this.thresholdDown2 = arr2[0].threshold_down;
-        this.chartData2 = {
-          labels: arr2.map(d => d.plc_create_dt.slice(11, 16)),
-          datasets: [
-            {
-              label: keys[1],
-              data: arr2.map(d => Number(d.value)),
-              borderColor: '#FF6B6B',
-              backgroundColor: 'rgba(255,107,107,0.2)',
-              fill: true,
-              tension: 0.3,
-              datalabels: {
-                display: true,
-                align: 'top',      // 점 위쪽에 표시
-                offset: 1,        // 점에서 10px 위로 오프셋
-                color: '#333',
-                font: {
-                  size: 10,
-                  weight: 'bold'
+          if (keys.length > 1) {
+            const arr2 = infoData[keys[1]].slice(-5);
+            this.thresholdUp2 = arr2[0].threshold_up;
+            this.thresholdDown2 = arr2[0].threshold_down;
+            this.chartData2 = {
+              labels: arr2.map(d => d.plc_create_dt.slice(11, 16)),
+              datasets: [
+                {
+                  label: keys[1],
+                  data: arr2.map(d => Number(d.value)),
+                  borderColor: '#FF6B6B',
+                  backgroundColor: 'rgba(255,107,107,0.2)',
+                  fill: true,
+                  tension: 0.3,
+                  datalabels: { display: true, align: 'top', offset: 1, color: '#333', font: { size: 10, weight: 'bold' } }
                 }
-              }
-            }
-          ]
-        };
-      }
+              ]
+            };
+          }
         } catch (error) {
           console.error('Error during detail fetch:', error);
         }
@@ -227,7 +177,7 @@
             label: m,
             icon: '🛠️',
             link: '#',
-            machine_id: m.machine_id // 필요 시 식별용
+            machine_id: m.machine_id 
           }));
           this.menus = [
             ...machineMenus, 
@@ -249,29 +199,27 @@
       },
       async onMenuClick(item) {
         console.log("클릭된 메뉴:", item.label);
-
-        // 홈, 대시보드, 설정, 로그아웃은 기존 로직 유지
         const machine_id = await this.getMachineID(item.label);
         this.machineID = machine_id;
         await this.getDetailInformaition(machine_id);
       }
     },
       mounted() {
-        this.getMachineName(); // ✅ 페이지 진입 시 자동 호출
+        this.getMachineName();
         this.refreshTimer = setInterval(() => {
         if (this.machineID) {
           this.getDetailInformaition(this.machineID);
         }
-          }, 60000); // 60000ms = 1분
+          }, 60000); 
         },
         beforeUnmount() {
-          // ✅ 컴포넌트 해제 시 인터벌 제거
           clearInterval(this.refreshTimer);
         }
   }
 </script>
 
 <style scoped>
+/* style 태그 내용은 변경 사항이 없으므로 그대로 유지합니다. */
 /* 전체 페이지 레이아웃 */
 .page-container {
   display: flex;
