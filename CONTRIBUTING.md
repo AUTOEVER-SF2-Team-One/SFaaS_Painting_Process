@@ -10,7 +10,7 @@
 2.  [커밋 메시지 컨벤션](#커밋-메시지-컨벤션)
 3.  [Pull Request (PR) 프로세스](#pull-request-pr-프로세스)
 4.  [이슈(Issue) 관리 방안](#이슈issue-관리-방안)
-
+5.  [코딩 컨벤션](#코딩-컨벤션)
 ---
 
 ## Git 브랜치 전략
@@ -102,3 +102,34 @@ docs: Update CONTRIBUTING.md with PR template info
     -   **상태 라벨**:
         -   `In Progress`: 작업 진행 중
         -   `Needs Review`: 검토 필요
+## 코딩 컨벤션
+**1. 패키지 구조**
+    - `controller, service, model, mapper` 단위로 패키지를 구분한다.
+    - `Controller` 클래스는 반드시 `controller` 패키지에 위치한다.
+
+**2. 클래스 선언부**
+    - 모든 컨트롤러는 @RestController를 사용한다.
+    - 공통 prefix는 @RequestMapping("/api")로 지정한다.
+    - 클래스명은 *Controller로 끝나도록 한다.
+
+**3. 의존성 주입**
+    - @Autowired는 생성자 주입 방식을 원칙으로 한다.
+    - final 키워드를 활용하여 불변성을 보장한다.
+    - 필드 주입은 금지한다.    
+
+**4. API 메서드 작성 규칙**
+
+- 엔드포인트 규칙
+    - HTTP 메서드에 맞는 @GetMapping, @PostMapping, @PutMapping, @DeleteMapping을 사용한다.
+    - URL 네이밍은 소문자, 단수형을 원칙으로 한다.
+    - 필요 시 /{id} 경로 변수를 사용한다.
+
+- 파라미터 규칙
+    - @RequestParam은 명시적으로 작성한다.
+    - 변수명은 DB 컬럼 그대로 쓰지 말고 Java 네이밍 컨벤션(camelCase)을 따른다
+    - 불필요한 혼동(machine_id vs machine_name)이 없도록 리팩토링한다.
+
+- 응답 규칙
+    - 응답은 ResponseEntity<T> 사용을 권장한다.
+    - 단일 객체 반환 시 Optional 활용 고려.
+    - 리스트/맵 반환 시 제네릭 명시 (List<DetailModel>, Map<String, List<DetailModel>>).
