@@ -69,6 +69,7 @@
 import Sidebar from '@/components/SideBar.vue';
 import DoughnutChart from '@/components/DoughnutChart.vue';
 import BarChart from '@/components/BarChart.vue';
+import axios from 'axios';
 
 // API 엔드포인트 상수화
 const DOWNTIME_API = '/api/downtime';
@@ -108,17 +109,17 @@ export default {
   methods: {
     async getMachineList() {
       try {
-        const response = await fetch(DETAIL_API);
-        const machines = await response.json();
-        
+        const response = await axios.get(DETAIL_API);
+        const machines = response.data;
+
         // 각 머신 이름으로 ID를 조회하는 비동기 작업들을 생성합니다.
         const machineMenuPromises = machines.map(async (machineName) => {
-          const idResponse = await fetch(`${DETAIL_API}/machineid?machine_id=${encodeURIComponent(machineName)}`);
-          const machineId = await idResponse.text();
+          const idResponse = await axios.get(`${DETAIL_API}/machineid?machine_id=${encodeURIComponent(machineName)}`);
+          const machineId = idResponse.data;
           return {
             label: machineName,
             icon: '🛠️',
-            machine_id: machineId 
+            machine_id: machineId
           };
         });
 
@@ -142,31 +143,31 @@ export default {
       this.loading = true;
       try {
         const [kpiRes, trendRes, logsRes, machineErrorRes, typeErrorRes] = await Promise.all([
-          fetch(`${DOWNTIME_API}/kpi?machine_id=${machineId}`),
-          fetch(`${DOWNTIME_API}/trends?machine_id=${machineId}`),
-          fetch(`${DOWNTIME_API}/logs?machine_id=${machineId}`),
-          fetch(`${DOWNTIME_API}/errors/machine`),
-          fetch(`${DOWNTIME_API}/errors/type`),
+          axios.get(`${DOWNTIME_API}/kpi?machine_id=${machineId}`),
+          axios.get(`${DOWNTIME_API}/trends?machine_id=${machineId}`),
+          axios.get(`${DOWNTIME_API}/logs?machine_id=${machineId}`),
+          axios.get(`${DOWNTIME_API}/errors/machine`),
+          axios.get(`${DOWNTIME_API}/errors/type`),
         ]);
 
-        this.kpiData = await kpiRes.json();
-        
-        const trendData = await trendRes.json();
+        this.kpiData = kpiRes.data;
+
+        const trendData = trendRes.data;
         this.trendChartData = {
           ...this.trendChartData,
           labels: trendData.labels,
           datasets: [{ ...this.trendChartData.datasets[0], data: trendData.data }]
         };
 
-        this.downtimeLogs = await logsRes.json();
+        this.downtimeLogs = logsRes.data;
 
-        const machineError = await machineErrorRes.json();
+        const machineError = machineErrorRes.data;
         this.machineErrorData = {
             labels: Object.keys(machineError),
             datasets: [{ ...this.machineErrorData.datasets[0], data: Object.values(machineError) }]
         };
 
-        const typeError = await typeErrorRes.json();
+        const typeError = typeErrorRes.data;
         this.machineTypeErrorData = {
             labels: Object.keys(typeError),
             datasets: [{ ...this.machineTypeErrorData.datasets[0], data: Object.values(typeError) }]

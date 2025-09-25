@@ -49,6 +49,7 @@
   import Sidebar from '@/components/SideBar.vue'
   import { TrackOpTypes } from 'vue';
   import DoughnutChart from '@/components/DoughnutChart.vue';
+  import axios from 'axios';
   const DETAIL_SERVER = '/api/detail';
 
   export default {
@@ -126,10 +127,10 @@
         try {
           const to = machine_id;
           console.log("선택된 머신 아이디:", to);
-          const response = await fetch(`${DETAIL_SERVER}/information?machine_id=${to}`);
-          const data = await response.json();
-          const response2 = await fetch(`${DETAIL_SERVER}/machineInformation?machine_id=${to}`);
-          const data2 = await response2.json();
+          const response = await axios.get(`${DETAIL_SERVER}/information?machine_id=${to}`);
+          const data = response.data;
+          const response2 = await axios.get(`${DETAIL_SERVER}/machineInformation?machine_id=${to}`);
+          const data2 = response2.data;
           this.machineName = data2.machine_name + " " + to;
           this.machineDate = data2.machine_date;
           this.isMachineRun = data2.is_machine_run;
@@ -143,7 +144,7 @@
           const totalMinutesInDay = 24 * 60;
           this.runRatio = Math.min(runTime.minutes, totalMinutesInDay) / 1440 * 100; // 24시간 초과 방지
           this.idleRatio = 100 - this.runRatio;
-          
+
           console.log("가동 시간 비율:", this.runRatio, "분");
           console.log("비가동 시간 비율:", this.idleRatio, "분");
           this.doughnutData = {
@@ -218,8 +219,8 @@
       },
       async getMachineName(){
         try{
-          const response = await fetch(`${DETAIL_SERVER}`);
-          const machines = await response.json();
+          const response = await axios.get(`${DETAIL_SERVER}`);
+          const machines = response.data;
           console.log("받은 머신이름:", machines);
           this.machines = machines;
           const machineMenus = machines.map(m => ({
@@ -238,8 +239,8 @@
       },
       async getMachineID(item){
         try{
-              const response = await fetch(`${DETAIL_SERVER}/machineid?machine_id=${encodeURIComponent(item)}`);
-              const machineId = await response.text();
+              const response = await axios.get(`${DETAIL_SERVER}/machineid?machine_id=${encodeURIComponent(item)}`);
+              const machineId = response.data;
               console.log("받은 머신별 데이터:", machineId);
               return machineId
           }catch(error){
