@@ -1,15 +1,15 @@
 <template>
   <div class="main-content">
-    <h2 class="view-title">품질 현황 대시보드</h2>
+    <h2 class="view-title">불량 데이터 대시보드</h2>
 
     <div class="kpi-container">
       <div class="kpi-card">
         <h4>금일 총 검수량</h4>
-        <p>{{ kpiData.totalInspections }} 건</p>
+        <p>{{ kpiData.totalInspections }}</p>
       </div>
       <div class="kpi-card">
         <h4>금일 불량 건수</h4>
-        <p class="defect-count">{{ kpiData.totalDefects }} 건</p>
+        <p>{{ kpiData.totalDefects }}</p>
       </div>
       <div class="kpi-card">
         <h4>최근 7일 불량률</h4>
@@ -21,68 +21,67 @@
       </div>
     </div>
 
-    <div class="chart-grid">
-      <div class="chart-container-large">
-        <h3>일별 불량 발생 추이</h3>
-        <BarChart :chartData="dailyTrendData" v-if="!loading" />
+    <div class="chart-container-full">
+      <h3>일별 불량 발생 추이</h3>
+      <BarChart :chartData="dailyTrendData" v-if="!loading" />
+    </div>
+    
+    <div class="details-grid">
+      <div class="log-container">
+        <h3>상세 불량 내역 로그</h3>
+        <div class="log-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>발생 설비</th>
+                <th>검수 시간</th>
+                <th>차대번호</th>
+                <th>색상</th>
+                <th>불량 유형</th>
+                <th>검수 담당자</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="log in defectLogs" :key="log.id">
+                <td>{{ log.machineName }}</td>
+                <td>{{ formatDateTime(log.inspectionTime) }}</td>
+                <td>{{ log.vin }}</td>
+                <td>{{ log.color }}</td>
+                <td><span class="error-code">{{ log.errorName }}</span></td>
+                <td>{{ log.inspectorName }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="chart-container-small">
+
+      <div class="chart-container-half">
          <h3>불량 유형별 분포</h3>
          <DoughnutChart :chartData="defectTypeData" />
       </div>
-      <div class="chart-container-small">
+      <div class="chart-container-half">
           <h3>설비별 불량 발생 건수</h3>
           <DoughnutChart :chartData="defectByMachineData" />
-      </div>
-    </div>
-    
-    <div class="log-container">
-      <h3>상세 불량 내역</h3>
-      <div class="log-table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>검수일시</th>
-              <th>차대번호(VIN)</th>
-              <th>색상</th>
-              <th>불량 유형</th>
-              <th>발생 설비</th>
-              <th>검수 담당자</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="log in defectLogs" :key="log.id">
-              <td>{{ formatDateTime(log.inspectionTime) }}</td>
-              <td>{{ log.vin }}</td>
-              <td>{{ log.color }}</td>
-              <td><span class="error-tag">{{ log.errorName }}</span></td>
-              <td>{{ log.machineName }}</td>
-              <td>{{ log.inspectorName }}</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-// Sidebar 임포트 제거
 import DoughnutChart from '@/components/DoughnutChart.vue';
 import BarChart from '@/components/BarChart.vue';
+import axios from 'axios';
 
-const DEFECT_API = '/api/defect';
+const API_BASE_URL = '/api/defect';
 
 export default {
   name: 'Defect',
-  // Sidebar 컴포넌트 등록 제거
   components: { 
     DoughnutChart,
     BarChart 
   },
   data() {
     return {
-      // menus 데이터 제거
       loading: true,
       kpiData: { totalInspections: 0, totalDefects: 0, defectRate: 0.0, mostFrequentDefect: 'N/A' },
       dailyTrendData: {
@@ -101,42 +100,41 @@ export default {
     }
   },
   methods: {
-    // onMenuClick 메소드 제거
     async fetchDashboardData() {
       this.loading = true;
       try {
-        // --- 임시 목(Mock) 데이터 ---
-        this.kpiData = { totalInspections: 152, totalDefects: 12, defectRate: 7.9, mostFrequentDefect: '오렌지 필' };
-        
-        const trendData = { labels: ['09-18', '09-19', '09-20', '09-21', '09-22', '09-23', '09-24'], data: [2, 3, 1, 2, 1, 2, 1] };
-        const typeData = { '오렌지 필': 5, '도장 흘러내림': 3, '핀홀': 2, '이물질 부착': 2 };
-        const machineData = { '2번 도장 로봇': 7, '1번 도장 로봇': 4, '1번 건조 오븐': 1 };
-        this.defectLogs = [
-            { id: 1, inspectionTime: '2025-09-24 11:35:20', vin: 'KNA12345VIN005', color: 'Mars Orange', errorName: '도장 흘러내림', machineName: '2번 도장 로봇', inspectorName: '이영희' },
-            { id: 2, inspectionTime: '2025-09-23 16:55:00', vin: 'KNA12345VIN007', color: 'Steel Gray', errorName: '오렌지 필', machineName: '1번 도장 로봇', inspectorName: '김철수' },
-            { id: 3, inspectionTime: '2025-09-23 14:10:30', vin: 'KNA12345VIN006', color: 'Snow White Pearl', errorName: '핀홀', machineName: '1번 건조 오븐', inspectorName: '김철수' },
-            { id: 4, inspectionTime: '2025-09-22 09:15:45', vin: 'KNA12345VIN008', color: 'Aurora Black', errorName: '오렌지 필', machineName: '2번 도장 로봇', inspectorName: '이영희' },
-        ];
-        // --- 임시 목(Mock) 데이터 끝 ---
+        const [kpiRes, trendsRes, typeRes, machineRes, logsRes] = await Promise.all([
+          axios.get(`${API_BASE_URL}/kpi`),
+          axios.get(`${API_BASE_URL}/trends`),
+          axios.get(`${API_BASE_URL}/errors/type`),
+          axios.get(`${API_BASE_URL}/errors/machine`),
+          axios.get(`${API_BASE_URL}/logs`)
+        ]);
 
+        this.kpiData = kpiRes.data;
+        
+        const trendData = trendsRes.data;
         this.dailyTrendData = {
-          ...this.dailyTrendData,
           labels: trendData.labels,
           datasets: [{ ...this.dailyTrendData.datasets[0], data: trendData.data }]
         };
 
+        const typeData = typeRes.data;
         this.defectTypeData = {
             labels: Object.keys(typeData),
             datasets: [{ ...this.defectTypeData.datasets[0], data: Object.values(typeData) }]
         };
 
+        const machineData = machineRes.data;
         this.defectByMachineData = {
             labels: Object.keys(machineData),
             datasets: [{ ...this.defectByMachineData.datasets[0], data: Object.values(machineData) }]
         };
 
+        this.defectLogs = logsRes.data;
+
       } catch (error) {
-        console.error('Failed to fetch defect dashboard data:', error);
+        console.error('대시보드 데이터를 가져오는 데 실패했습니다:', error);
       } finally {
         this.loading = false;
       }
@@ -145,7 +143,11 @@ export default {
     formatDateTime(isoString) {
       if (!isoString) return '-';
       const date = new Date(isoString);
-      return date.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+      return date.toLocaleString('ko-KR', { 
+          year: 'numeric', month: '2-digit', day: '2-digit', 
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hour12: false 
+      });
     }
   },
   mounted() {
@@ -155,78 +157,62 @@ export default {
 </script>
 
 <style scoped>
-/* page-container 스타일 제거 */
+/* 전체 페이지 스타일 */
 .main-content {
-  flex-grow: 1;
-  /* margin-left 제거하여 전체 너비 사용 */
+  padding: 20px;
   background-color: #f4f7f6;
-  width: 100%; /* 전체 너비 차지하도록 설정 */
 }
 .view-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 25px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
 }
 .kpi-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 .kpi-card {
   background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   text-align: center;
-  border-top: 4px solid #667eea;
 }
 .kpi-card h4 {
-  font-size: 1.1rem;
-  color: #555;
-  margin-bottom: 12px;
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 10px;
 }
 .kpi-card p {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  color: #333;
+  color: #667eea;
 }
-.kpi-card .defect-count {
-  color: #FF6B6B;
+.chart-container-full {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  height: 300px;
 }
-.chart-grid {
+.details-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: 20px;
-  margin-bottom: 25px;
-}
-.chart-container-large {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  height: 350px;
-}
-.chart-container-small {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  height: 350px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 .log-container {
+  grid-column: 1 / 2;
   background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 .log-table-wrapper {
-  max-height: 450px;
+  max-height: 400px;
   overflow-y: auto;
 }
 table {
@@ -234,29 +220,38 @@ table {
   border-collapse: collapse;
 }
 th, td {
-  padding: 14px 18px;
+  padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #eee;
 }
 th {
-  background-color: #f8f9fa;
+  background-color: #fafafa;
   font-weight: 600;
-  color: #333;
 }
-.error-tag {
+.error-code {
   background-color: #FF6B6B;
   color: white;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
   font-weight: 500;
 }
+.chart-container-half {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 350px; 
+}
 h3 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 20px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 15px;
   text-align: center;
   width: 100%;
-  color: #2c3e50;
 }
 </style>
