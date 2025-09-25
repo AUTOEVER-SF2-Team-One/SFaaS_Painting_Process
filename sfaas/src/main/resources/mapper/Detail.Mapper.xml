@@ -21,6 +21,7 @@
 <!--        // get machineName, machineStartDate, isRun-->
         SELECT machine_name, machine_id
         FROM machine
+        WHERE machine_id NOT IN ('FACTORY', 'OUT')
     </select>
 
     <select id="getMachineName" resultMap="detailMap"
