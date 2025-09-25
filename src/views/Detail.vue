@@ -1,39 +1,56 @@
-    <template>
-      <div class="page">
-        <div class="all">
-        <Sidebar :menuItems="menus" @menu-clicked="onMenuClick" />
-          <div class="grid-container">
-            <div class="grid-item"><LineChart :chartData="chartData" :thresholdUp="thresholdUp1" :thresholdDown="thresholdDown1" /></div>
-            <div class="grid-item"><LineChart :chartData="chartData2" :thresholdUp="thresholdUp2" :thresholdDown="thresholdDown2"/></div>
-            <div class="grid-item">
-              <div>
-                <p>📌 머신 이름: {{ machineName }}</p>
-                <p>🕒 측정 시간: {{ machineDate }}</p>
-                <div class="status-indicator">
-                <span :class="{'light-on': isMachineRun === 1, 'light-off': isMachineRun === 0}"></span>
-                <span>{{ isMachineRun === 1 ? '작동 중' : '정지됨' }}</span>
+<template>
+  <div class="page-container">
+    <Sidebar :menuItems="menus" @menu-clicked="onMenuClick" />
+    <div class="content-wrapper">
+      <div class="grid-card chart-card full-width-card">
+        <h3 class="card-header">주요 데이터 A</h3>
+        <LineChart :chartData="chartData" :thresholdUp="thresholdUp1" :thresholdDown="thresholdDown1" />
+      </div>
+
+      <div class="data-row">
+        <div class="grid-card chart-card">
+            <h3 class="card-header">주요 데이터 B</h3>
+            <LineChart :chartData="chartData2" :thresholdUp="thresholdUp2" :thresholdDown="thresholdDown2"/>
+        </div>
+
+        <div class="grid-card chart-card">
+            <h3 class="card-header">가동률</h3>
+            <DoughnutChart :chartData="doughnutData" />
+        </div>
+
+        <div class="grid-card info-card">
+            <h3 class="card-header">설비 정보</h3>
+            <div class="info-content">
+              <div class="info-item">
+                <span class="info-label">🕹️ 머신 이름</span>
+                <span class="info-value">{{ machineName }}</span>
               </div>
+              <div class="info-item">
+                <span class="info-label">🕒 마지막 점검일</span>
+                <span class="info-value">{{ machineDate }}</span>
+              </div>
+              <div class="info-item status-indicator">
+                <span class="info-label">🚦 현재 상태</span>
+                <div class="status-light-wrapper">
+                  <span :class="{'light-on': isMachineRun === 1, 'light-off': isMachineRun === 0}"></span>
+                  <span>{{ isMachineRun === 1 ? '작동 중' : '정지됨' }}</span>
+                </div>
               </div>
             </div>
-            <div class="grid-item">
-              <DoughnutChart :chartData="doughnutData" />
-            </div>
-          </div> 
         </div>
       </div>
-      
-    </template>
+    </div>
+  </div>
+</template>
 
-  <script>
+<script>
+  // <script> 내용은 이전 제안과 동일하게 유지합니다.
   import LineChart from '@/components/LineChart.vue'
   import Sidebar from '@/components/SideBar.vue'
   import { TrackOpTypes } from 'vue';
   import DoughnutChart from '@/components/DoughnutChart.vue';
   const DETAIL_SERVER = '/api/detail';
 
-  ///////////////////////////api/////////////////////////////// 
-  ///////////////////////////////////////////////////////////
-  //console.log(response);
   export default {
       name: 'Detail',
       components: { LineChart, Sidebar, DoughnutChart },
@@ -41,7 +58,7 @@
       data() {
         return {
           totalRunTime: '',
-          machines: [],
+          machines: ['error'],
           machineID: '',
           menus: [
           { label: '홈', icon: '🏠', link: '#' },
@@ -79,6 +96,12 @@
       methods: {
       async getDetailInformaition(machine_id) {
           function calculateTotalRunTime(dataArray) {
+            if (!Array.isArray(dataArray)) {
+              return {
+                text: "24시간 0분",
+                minutes: 1440,
+              };
+            }
             let totalMs = 0;
 
             dataArray.forEach(item => {
@@ -107,7 +130,7 @@
           const data = await response.json();
           const response2 = await fetch(`${DETAIL_SERVER}/machineInformation?machine_id=${to}`);
           const data2 = await response2.json();
-          this.machineName = data2.machine_name;
+          this.machineName = data2.machine_name + " " + to;
           this.machineDate = data2.machine_date;
           this.isMachineRun = data2.is_machine_run;
           console.log("받은 데이터:", data);
@@ -245,84 +268,126 @@
           clearInterval(this.refreshTimer);
         }
   }
-    
-  </script>
-  <style scoped>
-  .page {
-    height: 100%;
-    margin-left: 200px;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    overflow: hidden;
-  }
-  .all{
-    height: 100%;
-    grid-template-columns: 50% 50%;
-  } 
-  .grid-container {
-    flex-grow: 1;
-    display: grid;  
-    height: 99.9%;
-    grid-template-columns: 50% 50%;
-    grid-template-rows: 50% 50% ;  /* ✅ 행 높이를 아예 50%로 고정 */
-    gap: 0;                      
-    padding: 0;                   
-    margin: 0;                    
-    width: 100%;
-    /* border: 5px solid yellow; */
-  }
+</script>
 
-  .grid-item {
-    display: flex;
-    align-items: stretch;
-    justify-content: stretch;
-    /* background: #fff; */
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    border: 2px solid gray;
-    border-radius: 20px;
-    width: 95%;
-    height: 95%;
-  }
+<style scoped>
+/* 전체 페이지 레이아웃 */
+.page-container {
+  display: flex;
+  height: 100%;
+  background-color: var(--color-background-mute);
+}
 
-  .grid-item canvas {
-    width: 90% !important;
-    height: 90% !important; /* grid-item 크기에 맞춤 */  
-  }
-  .status-indicator {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-  }
+.content-wrapper {
+  flex-grow: 1;
+  margin-left: 200px;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 
-  .status-indicator .light-on,
-  .status-indicator .light-off {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: inline-block;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
-  }
+/* 데이터 행 레이아웃 (Flexbox 사용) */
+.data-row {
+  display: flex;
+  gap: 24px;
+  align-items: stretch; /* 카드 높이를 동일하게 맞춤 */
+}
 
-  .light-on {
-    background-color: #00ff00; /* 초록색 불빛 */
-    box-shadow: 0 0 10px #00ff00;
-  }
+/* 공통 카드 스타일 */
+.grid-card {
+  background-color: var(--color-background);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
 
-  .light-off {
-    background-color: #555; /* 꺼진 회색 불빛 */
-  }
-  .grid-item:nth-child(4) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-  }
-  /* 3번째 grid-item (왼쪽 아래) */
-  .grid-item:nth-child(3) {
-    display: flex;  
-    align-items: center;   /* 세로 가운데 */
-  }
-  </style>
+.grid-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-heading);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 12px;
+}
+
+/* 차트 카드 스타일 */
+.chart-card {
+  height: 350px;
+}
+
+/* 중요도에 따른 너비 조절 */
+.data-row > .chart-card {
+  flex: 2; /* 차트 카드들은 2의 비율을 가짐 */
+}
+
+.data-row > .info-card {
+  flex: 1; /* 정보 카드는 1의 비율을 가짐 (차트의 절반 크기) */
+}
+
+/* 정보 카드 스타일 */
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* 간격 살짝 줄임 */
+  font-size: 15px; /* 폰트 크기 살짝 줄임 */
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  color: var(--vt-c-text-light-2);
+  font-weight: 500;
+}
+
+.info-value {
+  color: var(--color-text);
+  font-weight: 600;
+  text-align: right;
+}
+
+/* 기계 상태 표시등 */
+.status-indicator .status-light-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.light-on, .light-off {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.light-on {
+  background-color: #28a745;
+  box-shadow: 0 0 8px #28a745;
+}
+
+.light-off {
+  background-color: #6c757d;
+}
+
+/* 캔버스 크기 조정 */
+.grid-card canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+</style>
