@@ -335,6 +335,7 @@
 
 .data-row > .info-card {
   flex: 1; /* 정보 카드는 1의 비율을 가짐 (차트의 절반 크기) */
+  height: 350px;
 }
 
 /* 정보 카드 스타일 */
@@ -391,5 +392,9 @@
 .grid-card canvas {
   width: 100% !important;
   height: 100% !important;
+}
+
+.full-width-card {
+  height: 500px; /* 원하는 높이로 조절 */
 }
 </style>
