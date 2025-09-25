@@ -1,6 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-box">
+      <img src="/src/assets/images/tetoever_logo.png" alt="Tetoever Logo" style="width:275px; margin-bottom:5px;" />
       <h1 class="logo">도장 모니터링</h1>
       <p class="welcome-text">로그인 후 서비스를 이용하세요.</p>
 
