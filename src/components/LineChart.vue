@@ -111,11 +111,10 @@ export default {
             }
           },
           y: {
-            min: 0,
-            max: 200,
             title: {
               display: true,
-              text: 'Value',
+              text: '온도 (℃)',
+
               color: '#333',
               font: {
                 size: 14,

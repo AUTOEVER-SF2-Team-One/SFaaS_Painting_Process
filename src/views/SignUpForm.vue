@@ -1,14 +1,21 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h1 class="logo">MyApp</h1>
+      <h1 class="logo">도장 모니터링</h1>
       <p class="welcome-text">회원가입 정보를 입력하세요.</p>
 
-      <form @submit.prevent="handleSignup">
+      <!-- 로딩 오버레이 -->
+        <div v-if="isLoading">
+          <div></div>
+          <p>메일 전송 중입니다...</p>
+        </div>
+
+      <form @submit.prevent="signup">
         <input 
           type="text" 
           v-model="id" 
           placeholder="아이디" 
+          :readonly="isEditMode"
           required
         />
         <input 
@@ -33,17 +40,21 @@
           type="password" 
           v-model="mailCert" 
           placeholder="이메일 인증 확인" 
+          :disabled="isCertDisabled"
+          v-if="!isEditMode"
           required
         />
 
-        <!-- 이메일 인증 버튼 (비활성화 + 타이머 표시) -->
+        <!-- 인증 버튼 -->
         <button 
           type="button" 
           @click="sendCert"
         >
-          {{ isSent ? "인증번호 확인" : "이메일 인증" }}
+          {{ isEditMode ? "수정" : (isSent ? "인증번호 확인" : "이메일 인증") }}
         </button>
-        <span v-if="isSent" class="timer-text">
+
+        <!-- 타이머 -->
+        <span v-if="isSent && !isEditMode" class="timer-text">
           {{ remainingTime }}초 ⏳ 인증번호 확인
         </span>
       </form>
@@ -56,77 +67,209 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+
+const URL = '/api/hr';
+const MAIL_SERVER = '/api/mail/send';
+const MAIL_SERVER_CERT = '/api/mail/verify';
 
 const router = useRouter()
 const id = ref('')
 const username = ref('')
 const email = ref('')
 const password = ref('')
-const mailCert = ref("")
+const mailCert = ref('')
+const certPwd = ref('')
+const isCertDisabled = ref(true); // 처음에는 비활성화
+const isEditMode = ref(false);
 
-const MAIL_SERVER = 'http://127.0.0.1:8000/send-email';
+
 const isSent = ref(false)
 const remainingTime = ref(60) // 1분 = 60초
 let timer = null
+const isLoading = ref(false); //로딩창
+
+const route = useRoute();
+onMounted(() => {
+  const presentId = sessionStorage.getItem("accountId");
+  if(presentId != null){
+    isEditMode.value = true;
+    findAll(presentId);
+  }else{
+    isEditMode.value = false;
+  }
+
+});
+
+
+
 
 // 회원가입 요청 (이메일 전송 포함)
 const handleSignup = async () => {
   try {
-    const response = await fetch(MAIL_SERVER, {
+    isLoading.value = true; // 로딩 시작
+    const to = encodeURIComponent(email.value);
+    const response = await fetch(`${MAIL_SERVER}?to=${to}`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json", 
-      },
-      body: JSON.stringify({
-        to_email: email.value,
-        subject: "MES 인증 번호",
-        body: `${username.value}님은 265544 입니다.`
-      })
     });
+    
 
     if (!response.ok) {
       throw new Error("서버 오류: " + response.status);
     }
-
-    const result = await response.json();
-    console.log("이메일 전송 성공:", result);
+    isCertDisabled.value = false;
+    alert('인증번호가 전송되었습니다.');
 
   } catch (error) {
-    console.error("이메일 전송 실패:", error);
+    alert("이메일 전송 실패:", error);
+  } finally {
+    isLoading.value = false; // 로딩 종료
   }
 };
 
 // 인증 버튼 클릭 시 → 버튼 비활성화 + 타이머 표시
-const sendCert = () => {
-  if(isSent.value){
-    if('265544' === mailCert.value){
-      alert('인증되었습니다.');
-      router.push('/');
-    }else{
-      alert('인증번호가 틀렸습니다.');
-    }
-  }else{
-    isSent.value = true
-    remainingTime.value = 60
-
-    // 타이머 시작
-    timer = setInterval(() => {
-      if (remainingTime.value > 0) {
-        remainingTime.value--
-      } else {
-        clearInterval(timer)
-        isSent.value = false // 시간이 끝나면 다시 인증 버튼 활성화
-      }
-    }, 1000)
-
-    // 버튼 클릭하면 이메일도 전송
-    handleSignup()
+const sendCert = async () => {
+  if (isEditMode.value) {
+    const sessionId = sessionStorage.getItem("accountId");
+    updateAll(sessionId); // 수정용 함수 실행
+    return;      // 여기서 종료
   }
 
-  
+  if(isSent.value){
+    try {
+      const certRes = await fetch(MAIL_SERVER_CERT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // JSON 전송
+        },
+        body: JSON.stringify({
+          username: email.value,
+          password: mailCert.value
+        })
+      });
+
+      if (!certRes.ok) {
+        throw new Error("서버 오류: " + certRes.status);
+      }
+
+      const data = await certRes.json();
+
+      if (data.status === 'fail') {
+        throw new Error("인증번호 오류: " + data.message);
+      } else {
+        signup(); // ✅ 인증 성공 시 실행
+      }
+
+    } catch (err) {
+      console.error(err.message);
+      alert(err.message);
+    }
+  }else{
+    if(id.value === null || id.value === ""){
+      alert('아이디를 작성해주세요.');
+    }else if(email.value === null || email.value === ""){
+      alert('메일을 작성해주세요.');
+    }else if(username.value === null || username.value === ""){
+      alert('이름을 작성해주세요.');
+    }else if(password.value === null || password.value === ""){
+      alert('비밀번호를 작성해주세요.');
+    }else{
+      isSent.value = true
+      remainingTime.value = 60
+
+      // 타이머 시작
+      timer = setInterval(() => {
+        if (remainingTime.value > 0) {
+          remainingTime.value--
+        } else {
+          clearInterval(timer)
+          isSent.value = false // 시간이 끝나면 다시 인증 버튼 활성화
+          isCertDisabled.value = true;
+        }
+      }, 1000)
+
+      // 버튼 클릭하면 이메일도 전송
+      handleSignup()
+    }
+  }
 }
+
+//회원가입 정보 전달.
+const signup = async () => {
+  try {
+    const response = await fetch(URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // JSON 전송
+      },
+      // credentials: "include", // 쿠키 인증 필요 시
+      body: JSON.stringify({
+        id: id.value,
+        email: email.value,
+        name: username.value,
+        pw: password.value
+      })
+    }).then(res => res.json())
+      .then(data => {
+        if (data.status === 'fail') {
+          throw new Error("회원가입 오류: " + data.message);
+        } else {
+          alert("인증되었습니다.")
+          router.push('/');
+        }
+      })
+      .catch(err => {
+        router.push({ path: '/', query: { run: 'true' } });
+        alert(err.message);
+      });
+  } catch (error) {
+    console.error("로그인 실패:", error);
+  }
+};
+
+const updateAll = async (sessionId) => {
+  const response = await fetch(URL+`/update/${sessionId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json", // JSON 전송
+        },
+        body: JSON.stringify({
+          pw: password.value,
+          id: id.value,
+          name: username.value,
+          email: email.value
+        })
+      }).then(res => res.json())
+        .then(data => {
+          if (data.status === 'fail') {
+            throw new Error("회원정보 수정 오류: " + data.message);
+          } else {
+            alert('정보가 수정되었습니다.');
+            router.push('/');
+            username.value = '';
+            password.value = '';
+          }
+        })
+        .catch(err => {
+          console.error(err.message);
+          alert(err.message);
+        });
+}
+
+
+//계정 정보 가져오기
+const findAll = async (sessionId) => {
+    const userAll = await fetch(URL+`/${sessionId}`);
+    const data = await userAll.json();
+    console.log(data.id)
+    console.log(data.email)
+    console.log(data.name)
+    id.value = data.id;
+    username.value = data.name;
+    email.value = data.email;
+  }
+
 </script>
 <style scoped>
 /* 기존 로그인 디자인 그대로 재사용 가능 */
