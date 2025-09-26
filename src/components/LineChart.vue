@@ -114,6 +114,7 @@ export default {
             title: {
               display: true,
               text: '온도 (℃)',
+
               color: '#333',
               font: {
                 size: 14,

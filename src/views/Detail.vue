@@ -7,7 +7,7 @@
             <div class="grid-item"><LineChart :chartData="chartData2" :thresholdUp="thresholdUp2" :thresholdDown="thresholdDown2"/></div>
             <div class="grid-item">
               <div>
-                <p>📌 머신 이름: {{ machineName }}</p>
+                <p>🕹️ 머신 이름: {{ machineName }}</p>
                 <p>🕒 측정 시간: {{ machineDate }}</p>
                 <div class="status-indicator">
                 <span :class="{'light-on': isMachineRun === 1, 'light-off': isMachineRun === 0}"></span>
@@ -41,7 +41,7 @@
       data() {
         return {
           totalRunTime: '',
-          machines: [],
+          machines: ['error'],
           machineID: '',
           menus: [
           { label: '홈', icon: '🏠', link: '#' },
@@ -79,6 +79,12 @@
       methods: {
       async getDetailInformaition(machine_id) {
           function calculateTotalRunTime(dataArray) {
+            if (!Array.isArray(dataArray)) {
+              return {
+                text: "24시간 0분",
+                minutes: 1440,
+              };
+            }
             let totalMs = 0;
 
             dataArray.forEach(item => {
@@ -107,7 +113,7 @@
           const data = await response.json();
           const response2 = await fetch(`${DETAIL_SERVER}/machineInformation?machine_id=${to}`);
           const data2 = await response2.json();
-          this.machineName = data2.machine_name;
+          this.machineName = data2.machine_name + " " + to;
           this.machineDate = data2.machine_date;
           this.isMachineRun = data2.is_machine_run;
           console.log("받은 데이터:", data);
@@ -324,5 +330,6 @@
   .grid-item:nth-child(3) {
     display: flex;  
     align-items: center;   /* 세로 가운데 */
+    justify-content: center; /* 가로 가운데 */
   }
   </style>

@@ -51,7 +51,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div class="doughnut-wrapper" style="position: relative; width: 100%; height: 100%;">
     <canvas ref="canvas"></canvas>
   </div>
 </template>
