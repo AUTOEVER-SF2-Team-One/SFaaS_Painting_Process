@@ -1,0 +1,45 @@
+# ## C/C++ Build Artifacts ##
+# 컴파일된 실행 파일
+app
+*.out
+*.exe
+
+# 빌드 과정에서 생성되는 오브젝트 및 라이브러리 파일
+*.o
+*.a
+*.so
+*.lib
+*.dll
+*.slo
+*.lo
+*.d
+
+# 빌드 디렉토리
+build/
+bin/
+
+
+# ## IDE & Editor Configuration ##
+# Visual Studio Code
+.vscode/
+
+# CLion / JetBrains
+.idea/
+
+# Vim & Emacs swap/backup files
+*.swp
+*~
+
+
+# ## Operating System Files ##
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+
+# ## Docker ##
+# Docker-compose가 생성하는 로컬 오버라이드 파일 (필요시)
+# docker-compose.override.yml
