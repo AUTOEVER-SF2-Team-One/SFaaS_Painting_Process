@@ -4,6 +4,35 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <modbus.h>
+#include <time.h>
+
+int getTemperature(void) {
+    static int temp = 250; // 25.0도 (0.1도 단위)
+    static int initialized = 0;
+    if (!initialized) {
+        srand((unsigned int)time(NULL));
+        initialized = 1;
+    }
+    int delta = (rand() % 5) - 2; // -2 ~ +2
+    temp += delta;
+    if (temp < 150) temp = 150; // 15.0도
+    if (temp > 350) temp = 350; // 35.0도
+    return temp;
+}
+
+int getHumid(void) {
+    static int humid = 500; // 50.0% (0.1% 단위)
+    static int initialized = 0;
+    if (!initialized) {
+        srand((unsigned int)time(NULL) + 1);
+        initialized = 1;
+    }
+    int delta = (rand() % 5) - 2; // -2 ~ +2
+    humid += delta;
+    if (humid < 300) humid = 300; // 30.0%
+    if (humid > 800) humid = 800; // 80.0%
+    return humid;
+}
 
 int main(void) {
     modbus_t *ctx;
