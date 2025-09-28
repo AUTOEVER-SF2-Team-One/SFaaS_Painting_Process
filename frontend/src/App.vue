@@ -18,7 +18,8 @@ const route = useRoute()
 <style scoped>
 .main-content {
   margin-top: 60px; /* 헤더 높이만큼 여백 */
-  padding: 20px;
+  width : 100vw;
+  height : calc(100vh - 60px);
 }
 
 </style>
