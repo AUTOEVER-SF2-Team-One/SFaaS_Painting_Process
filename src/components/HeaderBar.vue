@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <h1 class="logo">HYUNDAI</h1>
+    <h1 class="logo">TETOEVER</h1>
     <nav class="nav">
       <div class="menu-left">
         <NavButton text="Main" to="/main" />
@@ -123,7 +123,7 @@ export default {
   left: 0;
   right: 0;
   height: 60px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #f4f7f6; /* 옅은 회색 */
   display: flex;
   align-items: center;
   justify-content: flex-start; /* 왼쪽 정렬 */
@@ -133,8 +133,14 @@ export default {
 }
 
 .logo {
-  font-weight: bold;
-  margin-right: 40px; /* 로고와 메뉴 사이 여백 */
+  font-size: 24px;
+  font-weight: 700;
+  /* 로그인 페이지와 일관된 그라데이션 텍스트 효과 */
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-right: 40px;
 }
 
 .nav {
@@ -175,7 +181,7 @@ export default {
 .hamburger span {
   display: block;
   height: 3px;
-  background-color: white;
+  background-color: black;
   border-radius: 2px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
