@@ -10,6 +10,7 @@
 2.  [커밋 메시지 컨벤션](#커밋-메시지-컨벤션)
 3.  [Pull Request (PR) 프로세스](#pull-request-pr-프로세스)
 4.  [이슈(Issue) 관리 방안](#이슈issue-관리-방안)
+5.  [코딩 컨벤션] (#코딩-컨벤션)
 
 ---
 
@@ -102,3 +103,33 @@ docs: Update CONTRIBUTING.md with PR template info
     -   **상태 라벨**:
         -   `In Progress`: 작업 진행 중
         -   `Needs Review`: 검토 필요
+## 코딩 컨벤션
+
+우리 프로젝트는 일관된 코드 스타일을 유지하기 위해 다음 코딩 컨벤션을 따릅니다.
+모든 팀원이 같은 규칙을 따르면 코드의 가독성이 높아지고 유지보수가 용이해집니다.
+
+**1. 네이밍 규칙**
+    - 클래스 / 컴포넌트: `PascalCase`
+    - 변수 / 함수: `camelCase`
+    - 상수: `UPPER_CASE_WITH_UNDERSCORES`
+    - 폴더 / 파일명: `kebab-case`
+
+**2. 들여쓰기 & 공백**
+    - 들여쓰기: 4칸(Spaces, Tab 금지)
+    - 중괄호 {}는 같은 줄에서 시작
+    - 연산자 및 쉼표 뒤에는 공백 삽입
+
+**3. 코드 스타일**
+    - 한 줄 최대 길이: 100자
+    - JavaScript/TypeScript에서는 세미콜론 반드시 사용
+    - Python에서는 `PEP8` 준수
+
+**4. 주석 규칙**
+    - 한 줄 주석: // 또는 # 사용, 설명 대상 코드 위에 작성
+    - 문서화 주석: `JSDoc, JavaDoc` 스타일 권장
+
+**5. Git Hook & Linter**
+    - ESLint / Prettier: JS/TS 코드 자동 정렬
+    - Flake8 / Black: Python 코드 스타일 검사 및 포맷팅
+    - Checkstyle: Java 코드 스타일 검증
+    - PR 생성 전에 반드시 Linter 실행 및 오류 수정
