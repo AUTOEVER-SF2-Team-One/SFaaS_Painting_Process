@@ -27,6 +27,8 @@
 
 ## 🏗️ 시스템 아키텍처
 
+<img width="754" height="371" alt="Image" src="https://github.com/user-attachments/assets/1859f43d-9a9c-4701-a5f9-2a017720bef5" />
+
 1.  **데이터 수집**: 현장의 PLC 및 센서(온습도 등) 데이터를 OPC-UA와 Modbus 프로토콜을 통해 수집합니다.
 2.  **데이터 처리**: Node-RED가 수집된 데이터를 가공하여 비가동 시간을 계산하고, MySQL 데이터베이스에 저장합니다.
 3.  **백엔드 서버**: Spring Boot 기반의 API 서버가 프론트엔드에 필요한 데이터를 제공합니다.
