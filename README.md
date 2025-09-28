@@ -57,3 +57,6 @@ npm run dev
 - **강선규**: SRS, IDD, SDD 작성, Detail 페이지 구축
 - **이지운**: SWMP 페이지 구축, 인버터 제어 기능 구현
 - **이창열**: Login 페이지 구축, 채팅 서비스 구현
+
+## 🎥 시연 영상
+[![Video Label](http://img.youtube.com/vi/4vvZFJvkxrw/0.jpg)](https://youtu.be/4vvZFJvkxrw)
